@@ -4,7 +4,7 @@
 using namespace std;
 
 struct Servicio {
-  int codigo_servicio;
+  int codigo;
   char nombre[50];
   int duracion;
   double precio;
@@ -13,6 +13,7 @@ struct Servicio {
 
 void menu_principal();
 void limpiar_pantalla();
+void pausar_pantalla();
 void titulo_principal();
 void menu_usuario();
 void menu_especialidad();
@@ -279,6 +280,7 @@ void crear_servicio(void) {
       cout << "\tNombre del servicio: ";
       getline(cin, nombre);
       strcpy(serv.nombre, nombre.c_str());
+      cout << serv.nombre << endl;
 
       cout << "\tDuración del servicio: ";
       cin >> serv.duracion;
@@ -286,7 +288,8 @@ void crear_servicio(void) {
       cout << "\tPrecio: ";
       serv.precio = obtener_flotante();
       especialidad = "pendiente";
-      strcpy(serv.nombre, especialidad.c_str());
+      strcpy(serv.especialidad, especialidad.c_str());
+      cout << serv.especialidad << endl;
 
       if (insertar_servicio_archivo(serv)) {
         cout << "\n\tEl servicio fue creado satisfactoriamente" << endl;
@@ -416,21 +419,22 @@ void mostrar_servicio() {
 
   if (nro_servicios == 0) {
     cout << "\n\tEl archivo esta vacio" << endl;
-    system("pause>nul");
+    pausar_pantalla();
   } else {
 
-    cout << "\n\t\t SERVICIOS REGISTRADOS\n";
-    cout << "-------------------------------------------------------------\n";
+    cout << "\n\t\t\t\tSERVICIOS REGISTRADOS\n";
+    cout << "\n\t   ------------------------------------------------------------\n";
     for (int i = 0; i < nro_servicios; i++) {
       if (servicios[i].codigo != VALOR_CENTINELA) {
-        cout << "Codigo: " << servicios[i].codigo << endl;
-        cout << "Nombre: " << servicios[i].nombre << endl;
-        cout << "Duracion: " << servicios[i].duracion << endl;
-        cout << "Precio: " << servicios[i].precio << endl;
-        cout << "Especialidad: " << servicios[i].especialidad << endl;
+        cout << "\t\tCodigo: " << servicios[i].codigo << endl;
+        cout << "\t\tNombre: " << servicios[i].nombre << endl;
+        cout << "\t\tDuracion: " << servicios[i].duracion << endl;
+        cout << "\t\tPrecio: " << servicios[i].precio << endl;
+        cout << "\t\tEspecialidad: " << servicios[i].especialidad << endl;
       }
+    cout << "\n\t   ------------------------------------------------------------\n";
     }
-    system("pause>nul");
+    pausar_pantalla();
   }
 }
 
@@ -453,7 +457,7 @@ Servicio *obtener_st_archivo(int *n) {
   Servicio servicio;
   Servicio *servicios;
   int i;
-  
+
   archivo = fopen("servicios.dat", "rb");
 
   if (archivo == NULL) {
@@ -469,8 +473,18 @@ Servicio *obtener_st_archivo(int *n) {
     while (!feof(archivo)) {
       servicios[i] = servicio;
       fread(&servicio, sizeof(servicio), 1, archivo);
+      i++;
     }
     fclose(archivo);
   }
   return servicios;
 }
+
+void pausar_pantalla() {
+  char caracter;
+  cout << "\n\tPresiona 'Enter' para continuar...";
+  while (caracter != '\n') {
+    cin.get(caracter);
+  }
+}
+
