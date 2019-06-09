@@ -1,13 +1,13 @@
 #include <iostream>
-#include <string>
+#include <string.h>
 using namespace std;
 
 struct Servicio {
   int codigo_servicio;
-  string nombre;
+  char nombre[50];
   int duracion;
   double precio;
-  string especialidad;
+  char especialidad[50];
 };
 
 void menu_principal();
@@ -261,6 +261,7 @@ void crear_servicio(void) {
   bool se_repite = true;
   string respuesta;
   int codigo;
+  string nombre, especialidad;
 
   do {
     limpiar_pantalla();
@@ -274,13 +275,16 @@ void crear_servicio(void) {
       serv.codigo_servicio = codigo;
 
       cout << "\tNombre del servicio: ";
-      getline(cin, serv.nombre);
+      getline(cin, nombre);
+      strcpy(serv.nombre, nombre.c_str());
+
       cout << "\tDuración del servicio: ";
       cin >> serv.duracion;
       cin.ignore();
       cout << "\tPrecio: ";
       serv.precio = obtener_flotante();
-      serv.especialidad = "pendiente";
+      especialidad = "pendiente";
+      strcpy(serv.nombre, especialidad.c_str());
 
       if (insertar_servicio_archivo(serv)) {
         cout << "\n\tEl servicio fue creado satisfactoriamente" << endl;
