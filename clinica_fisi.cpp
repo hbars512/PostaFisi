@@ -1,9 +1,10 @@
 #include <iostream>
 #include <string>
+#define VALOR_CENTINELA -1
 using namespace std;
 
 struct Servicio {
-  int codigo_servicio;
+  int codigo;
   string nombre;
   int duracion;
   double precio;
@@ -27,6 +28,7 @@ double obtener_flotante();
 bool es_flotante_valido(string);
 
 bool insertar_servicio_archivo(Servicio serv);
+Servicio *obtener_st_archivo(int *n);
 
 int main(void)
 {
@@ -271,7 +273,7 @@ void crear_servicio(void) {
     cin >> codigo;
     cin.ignore();
     if (!existe_servicio(codigo, &serv)) {
-      serv.codigo_servicio = codigo;
+      serv.codigo = codigo;
 
       cout << "\tNombre del servicio: ";
       getline(cin, serv.nombre);
@@ -310,7 +312,7 @@ bool existe_servicio(int codigo_servicio, Servicio *serv) {
   if (!(archivo == NULL)) {
     fread(&(*serv), sizeof(*serv), 1, archivo);
     while (!feof(archivo)) {
-      if ((*serv).codigo_servicio == codigo_servicio) {
+      if ((*serv).codigo == codigo_servicio) {
         existe = true;
         break;
       }
@@ -400,11 +402,32 @@ bool insertar_servicio_archivo(Servicio serv) {
   return insercion;
 }
 
-void mostrar_servicio(void) {
-  int prueba;
-  cout << "Ingrese valor: ";
-  cin >> prueba;
-  cin.ignore();
+void mostrar_servicio() {
+  Servicio *servicios;
+  int nro_servicios;
+
+  limpiar_pantalla();
+  titulo_principal();
+  servicios = obtener_st_archivo(&nro_servicios);
+
+  if (nro_servicios == 0) {
+    cout << "\n\tEl archivo esta vacio" << endl;
+    system("pause>nul");
+  } else {
+
+    cout << "\n\t\t SERVICIOS REGISTRADOS\n";
+    cout << "-------------------------------------------------------------\n";
+    for (int i = 0; i < nro_servicios; i++) {
+      if (servicios[i].codigo != VALOR_CENTINELA) {
+        cout << "Codigo: " << servicios[i].codigo << endl;
+        cout << "Nombre: " << servicios[i].nombre << endl;
+        cout << "Duracion: " << servicios[i].duracion << endl;
+        cout << "Precio: " << servicios[i].precio << endl;
+        cout << "Especialidad: " << servicios[i].especialidad << endl;
+      }
+    }
+    system("pause>nul");
+  }
 }
 
 void actualizar_servicio(void) {
@@ -419,4 +442,31 @@ void eliminar_servicio(void) {
   cout << "Ingrese valor: ";
   cin >> prueba;
   cin.ignore();
+}
+
+Servicio *obtener_st_archivo(int *n) {
+  FILE *archivo;
+  Servicio servicio;
+  Servicio *servicios;
+  int i;
+  
+  archivo = fopen("servicios.dat", "rb");
+
+  if (archivo == NULL) {
+    *n = 0;
+    servicios = NULL;
+  } else {
+    fseek(archivo, 0, SEEK_END);
+    *n = ftell(archivo) / sizeof(Servicio);
+    servicios = (Servicio *)malloc((*n) * sizeof(Servicio));
+    fseek(archivo, 0, SEEK_SET);
+    fread(&servicio, sizeof(servicio), 1, archivo);
+    i = 0;
+    while (!feof(archivo)) {
+      servicios[i] = servicio;
+      fread(&servicio, sizeof(servicio), 1, archivo);
+    }
+    fclose(archivo);
+  }
+  return servicios;
 }
