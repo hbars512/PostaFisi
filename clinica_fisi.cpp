@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string.h>
-#define VALOR_CENTINELA -1
+#define PARA_ELIMINAR -1
 using namespace std;
 
 struct Servicio {
@@ -12,15 +12,34 @@ struct Servicio {
 };
 
 void menu_principal();
-void limpiar_pantalla();
-void pausar_pantalla();
-void titulo_principal();
 void menu_usuario();
 void menu_especialidad();
+
+
 void menu_servicios();
+void menu_servicios_opciones();
+
+void opcion_crear_servicio();
+bool insertar_servicio_archivo(Servicio serv);
+bool existe_servicio(int codigo_servicio, Servicio *serv);
+
+void opcion_mostrar_servicio();
+Servicio *obtener_st_archivo(int *n);
+
+void opcion_actualizar_servicio();
+bool modificar_archivo_servicio(Servicio serv);
+
+void opcion_eliminar_servicio();
+bool eliminar_servicio(int);
+bool eliminar_servicio_fisico();
+
 void menu_cita();
 void menu_historial();
 void menu_reportes();
+
+void limpiar_pantalla();
+void pausar_pantalla();
+void titulo_principal();
 
 int obtener_entero();
 int obtener_entero(int, int);
@@ -28,8 +47,6 @@ bool es_entero_valido(string);
 double obtener_flotante();
 bool es_flotante_valido(string);
 
-bool insertar_servicio_archivo(Servicio serv);
-Servicio *obtener_st_archivo(int *n);
 
 int main(void)
 {
@@ -76,11 +93,6 @@ void menu_principal(void) {
 void menu_servicios() {
   bool se_repite = true;
   int opcion;
-  void menu_servicios_opciones();
-  void crear_servicio();
-  void mostrar_servicio();
-  void actualizar_servicio();
-  void eliminar_servicio();
 
   do {
     menu_servicios_opciones();
@@ -88,16 +100,16 @@ void menu_servicios() {
 
     switch (opcion) {
       case 1:
-        crear_servicio();
+        opcion_crear_servicio();
         break;
       case 2:
-        mostrar_servicio();
+        opcion_mostrar_servicio();
         break;
       case 3:
-        actualizar_servicio();
+        opcion_actualizar_servicio();
         break;
       case 4:
-        eliminar_servicio();
+        opcion_eliminar_servicio();
         break;
       case 5:
         se_repite = false;
@@ -258,8 +270,7 @@ void limpiar_pantalla(void) {
   system("clear");
 }
 
-void crear_servicio(void) {
-  bool existe_servicio(int codigo_servicio, Servicio *serv);
+void opcion_crear_servicio(void) {
   Servicio serv;
   bool se_repite = true;
   string respuesta;
@@ -272,24 +283,20 @@ void crear_servicio(void) {
     cout << "\n\t\tCREAR NUEVO SERVICIO\n";
 
     cout << "\tIngresa el Codigo de servicio: ";
-    cin >> codigo;
-    cin.ignore();
+    codigo = obtener_entero();
     if (!existe_servicio(codigo, &serv)) {
       serv.codigo = codigo;
 
       cout << "\tNombre del servicio: ";
       getline(cin, nombre);
       strcpy(serv.nombre, nombre.c_str());
-      cout << serv.nombre << endl;
 
       cout << "\tDuración del servicio: ";
-      cin >> serv.duracion;
-      cin.ignore();
+      serv.duracion = obtener_entero();
       cout << "\tPrecio: ";
       serv.precio = obtener_flotante();
       especialidad = "pendiente";
       strcpy(serv.especialidad, especialidad.c_str());
-      cout << serv.especialidad << endl;
 
       if (insertar_servicio_archivo(serv)) {
         cout << "\n\tEl servicio fue creado satisfactoriamente" << endl;
@@ -299,8 +306,8 @@ void crear_servicio(void) {
       }
 
     } else {
-      cout << "\tEl servicio de codigo " << codigo << " ya existe.\n" << endl;
-      cout << "\tNo puede ingresar dos servicios con el mismo codigo" << endl;
+      cout << "\n\tEl servicio de codigo " << codigo << " ya existe.\n";
+      cout << "\t  No puede ingresar dos servicios con el mismo codigo" << endl;
     }
     cout << "\n\tDesea seguir ingresando servicios? [S/n]: ";
     getline(cin, respuesta);
@@ -409,7 +416,7 @@ bool insertar_servicio_archivo(Servicio serv) {
   return insercion;
 }
 
-void mostrar_servicio() {
+void opcion_mostrar_servicio() {
   Servicio *servicios;
   int nro_servicios;
 
@@ -425,7 +432,7 @@ void mostrar_servicio() {
     cout << "\n\t\t\t\tSERVICIOS REGISTRADOS\n";
     cout << "\n\t   ------------------------------------------------------------\n";
     for (int i = 0; i < nro_servicios; i++) {
-      if (servicios[i].codigo != VALOR_CENTINELA) {
+      if (servicios[i].codigo != PARA_ELIMINAR) {
         cout << "\t\tCodigo: " << servicios[i].codigo << endl;
         cout << "\t\tNombre: " << servicios[i].nombre << endl;
         cout << "\t\tDuracion: " << servicios[i].duracion << endl;
@@ -438,18 +445,212 @@ void mostrar_servicio() {
   }
 }
 
-void actualizar_servicio(void) {
-  int prueba;
-  cout << "Ingrese valor: ";
-  cin >> prueba;
-  cin.ignore();
+void opcion_actualizar_servicio(void) {
+  Servicio serv;
+  int codigo;
+  bool se_repite = true;
+  string respuesta, nombre, especialidad;
+
+  do {
+    limpiar_pantalla();
+    titulo_principal();
+    cout << "\n\t\t\t\tMODIFICAR SERVICIO\n";
+
+    cout << "\n\tCodigo del servicio: ";
+    codigo = obtener_entero();
+    if (existe_servicio(codigo, &serv)) {
+      cout << "\n\tNombre del servicio: " << serv.nombre << endl;
+      cout << "\tDuracion del servicio (min): " << serv.duracion << endl;
+      cout << "\tPrecio del servicio (s/.): " << serv.precio << endl;
+      cout << "\tEspecialidad del servicio: " << serv.especialidad << endl;
+
+      cout << "\n\tElija los datos a modificar\n" << endl;
+
+      cout << "\n\tNombre actual del servicio: " << serv.nombre << endl;
+      cout << "\tDeseas modificar el nombre? [S/N]: ";
+      getline(cin, respuesta);
+      if (respuesta.compare("S") == 0 || respuesta.compare("s") == 0) {
+        cout << "\tNuevo nombre: ";
+        getline(cin, nombre);
+        strcpy(serv.nombre, nombre.c_str());
+      }
+
+      cout << "\tDuracion actual del servicio (min): " << serv.duracion << endl;
+      cout << "\tDeseas modificar la duracion del servicio? [S/N]: ";
+      getline(cin, respuesta);
+      if (respuesta.compare("S") == 0 || respuesta.compare("s") == 0) {
+        cout << "\tNueva duracion: ";
+        serv.duracion = obtener_entero();
+      }
+
+      cout << "\tPrecio actual del servicio (S/.): " << serv.precio << endl;
+      cout << "\tDeseas modificar el precio del servicio? [S/N]: ";
+      getline(cin, respuesta);
+      if (respuesta.compare("S") == 0 || respuesta.compare("s") == 0) {
+        cout << "\tNuevo precio: ";
+        serv.precio = obtener_flotante();
+      }
+
+      cout << "\tEspecialidad acutal del servicio: " << serv.especialidad << endl;
+      cout << "\tDeseas modificar la especialidad del servicio? [S/N]: ";
+      getline(cin, respuesta);
+      if (respuesta.compare("S") == 0 || respuesta.compare("s") == 0) {
+        cout << "\tNueva especialidad: ";
+        getline(cin, especialidad);
+        strcpy(serv.especialidad, especialidad.c_str());
+      }
+
+      cout << "\nEsta seguro que desea modificar los datos del producto? [S/N]: ";
+      getline(cin, respuesta);
+      if (respuesta.compare("S") == 0 || respuesta.compare("s") == 0) {
+        if (modificar_archivo_servicio(serv)) {
+          cout << "\n\tEl servicio fue modificado correctamente\n";
+        } else {
+          cout << "\n\tOcurrio un error al intentar modificar el servicio\n";
+          cout << "\tIntentelo nuevamente\n";
+        }
+      }
+    } else {
+        cout << "\n\tEl servicio de codigo " << codigo << " no existe.\n";
+    }
+
+    cout << "\n\tDeseas modificar otro servicio? [S/N]: ";
+    getline(cin, respuesta);
+      if (!(respuesta.compare("S") == 0 || respuesta.compare("s") == 0)) {
+        se_repite = false;
+      }
+  } while (se_repite);
 }
 
-void eliminar_servicio(void) {
-  int prueba;
-  cout << "Ingrese valor: ";
-  cin >> prueba;
-  cin.ignore();
+bool modificar_archivo_servicio(Servicio serv) {
+  FILE *archivo;
+  bool modificado;
+  Servicio servicio;
+
+  archivo = fopen("servicios.dat", "rb+");
+
+  if (!(archivo == NULL)) {
+    modificado = false;
+    fread(&servicio, sizeof(servicio), 1, archivo);
+    while (!feof(archivo)) {
+      if (servicio.codigo == serv.codigo) {
+        fseek(archivo, ftell(archivo) - sizeof(serv), SEEK_SET);
+        fwrite(&serv, sizeof(serv), 1, archivo);
+        modificado = true;
+        break;
+      }
+      fread(&servicio, sizeof(servicio), 1, archivo);
+    }
+    fclose(archivo);
+  }
+  return modificado;
+}
+
+void opcion_eliminar_servicio(void) {
+  Servicio serv;
+  int codigo;
+  bool se_repite = true;
+  string respuesta;
+
+  do {
+    limpiar_pantalla();
+    titulo_principal();
+    cout << "\n\t\t\t\tELIMINAR SERVICIO\n";
+
+    cout << "\n\tCodigo de servicio: ";
+    codigo = obtener_entero();
+
+    if (existe_servicio(codigo, &serv)) {
+      cout << "\n\tCodigo del servicio: " << serv.codigo << endl;
+      cout << "\tNombre del servicio: " << serv.nombre << endl;
+      cout << "\tDuracion del servicio (min): " << serv.duracion << endl;
+      cout << "\tPrecio del servicio: " << serv.precio << endl;
+      cout << "\tEspecialidad: " << serv.especialidad << endl;
+
+      cout << "\n\tDesea eliminar el producto? [S/N]: ";
+      getline(cin, respuesta);
+
+      if (respuesta.compare("S") == 0 || respuesta.compare("s") == 0) {
+        if (eliminar_servicio(codigo)) {
+          if (eliminar_servicio_fisico()) {
+            cout << "\n\tSe elimino exitosamente del archivo\n";
+          } else {
+            cout << "\n\tEl servicio no pudo ser eliminado del archivo\n";
+            cout << "\tIntentelo mas tarde\n";
+          }
+        } else {
+          cout << "\n\tEl servicio no pudo ser eliminado\n";
+        }
+      }
+    } else {
+      cout << "\n\tEl servicio de codigo " << codigo << " no existe.\n";
+    }
+
+    cout << "\n\tDeseas eliminar otro servicio? [S/N]: ";
+    getline(cin, respuesta);
+
+    if (!(respuesta.compare("S") == 0 || respuesta.compare("s") == 0)) {
+      se_repite = false;
+    }
+  } while (se_repite);
+}
+
+bool eliminar_servicio(int codigo) {
+  FILE *archivo;
+  FILE *auxiliar;
+  Servicio serv;
+  bool se_elimina = false;
+
+  archivo = fopen("servicios.dat", "r+b");
+
+  if (archivo == NULL) {
+    se_elimina = false;
+  } else {
+    se_elimina = false;
+    fread(&serv, sizeof(serv), 1, archivo);
+    while (!feof(archivo)) {
+      if (serv.codigo == codigo) {
+        fseek(archivo, ftell(archivo) - sizeof(serv), SEEK_SET);
+        serv.codigo = PARA_ELIMINAR;
+        fwrite(&serv, sizeof(serv), 1, archivo);
+        se_elimina = true;
+        break;
+      }
+      fread(&serv, sizeof(serv), 1, archivo);
+    }
+    fclose(archivo);
+  }
+  return se_elimina;
+}
+
+bool eliminar_servicio_fisico() {
+  FILE *archivo;
+  FILE *auxiliar;
+  Servicio serv;
+  bool se_elimina = false;
+
+  archivo = fopen("servicios.dat", "rb");
+  auxiliar = fopen("auxiliar.dat", "wb");
+
+  if (archivo == NULL || auxiliar == NULL) {
+    se_elimina = false;
+  } else {
+    fread(&serv, sizeof(serv), 1, archivo);
+    while (!feof(archivo)) {
+      if (serv.codigo != PARA_ELIMINAR) {
+        fwrite(&serv, sizeof(serv), 1, auxiliar);
+      }
+      fread(&serv, sizeof(serv), 1, archivo);
+    }
+    fclose(archivo);
+    fclose(auxiliar);
+
+    remove("servicios.dat");
+    rename("auxiliar.dat", "servicios.dat");
+
+    se_elimina = true;
+  }
+  return se_elimina;
 }
 
 Servicio *obtener_st_archivo(int *n) {
