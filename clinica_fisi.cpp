@@ -1,5 +1,6 @@
 #include <iostream>
-#include <string.h>
+#include <cstring>
+#include <cstdlib>
 #define PARA_ELIMINAR -1
 using namespace std;
 
@@ -48,11 +49,15 @@ double obtener_flotante();
 bool es_flotante_valido(string);
 
 
-int main(void)
-{
+int main(void) {
   menu_principal();
-
   return 0;
+}
+
+void titulo_principal(void) {
+  cout << "\n     ======================================================================\n";
+  cout << "\t\t\t\t CLINICA FISI\n";
+  cout << "     ======================================================================\n";
 }
 
 void menu_principal(void) {
@@ -90,6 +95,36 @@ void menu_principal(void) {
   } while (se_repite);
 }
 
+void menu_principal_opciones(void) {
+  limpiar_pantalla();
+  titulo_principal();
+  cout << "\n\t\t\t\tMENU PRINCIPAL\n";
+  cout << "\n\t\t[1]. Usuarios\n";
+  cout << "\t\t[2]. Especialidades\n";
+  cout << "\t\t[3]. Servicios\n";
+  cout << "\t\t[4]. Cita\n";
+  cout << "\t\t[5]. Historial Medico\n";
+  cout << "\t\t[6]. Reportes\n";
+  cout << "\t\t[7]. Salir\n";
+  cout << "\n\t\tIngrese una opcion: ";
+}
+
+void menu_usuario() {
+  limpiar_pantalla();
+  titulo_principal();
+  cout << "\n\t\t\t\tMENU USUARIOS\n";
+  pausar_pantalla();
+
+}
+
+void menu_especialidad() {
+  int prueba;
+  limpiar_pantalla();
+  titulo_principal();
+  cout << "\n\t\t\t\tMENU USUARIOS\n";
+  pausar_pantalla();
+}
+
 void menu_servicios() {
   bool se_repite = true;
   int opcion;
@@ -118,20 +153,6 @@ void menu_servicios() {
   } while (se_repite);
 }
 
-void menu_principal_opciones(void) {
-  limpiar_pantalla();
-  titulo_principal();
-  cout << "\n\t\t\t\tMENU PRINCIPAL\n";
-  cout << "\n\t\t[1]. Usuarios\n";
-  cout << "\t\t[2]. Especialidades\n";
-  cout << "\t\t[3]. Servicios\n";
-  cout << "\t\t[4]. Cita\n";
-  cout << "\t\t[5]. Historial Medico\n";
-  cout << "\t\t[6]. Reportes\n";
-  cout << "\t\t[7]. Salir\n";
-  cout << "\n\t\tIngrese una opcion: [ ]\b\b";
-}
-
 void menu_servicios_opciones(void) {
   limpiar_pantalla();
   titulo_principal();
@@ -141,133 +162,7 @@ void menu_servicios_opciones(void) {
   cout << "\t\t[3]. Actualizar servicios\n";
   cout << "\t\t[4]. Eliminar servicio\n";
   cout << "\t\t[5]. Volver al menu principal\n";
-  cout << "\n\t\tIngrese una opcion: [ ]\b\b";
-}
-
-void menu_usuario() {
-  int prueba;
-  limpiar_pantalla();
-  titulo_principal();
-  cout << "\n\t\t\t\tMENU USUARIOS\n";
-  cout << "\t\tIngresar: ";
-  cin >> prueba;
-  cin.ignore();
-}
-
-void menu_especialidad() {
-  int prueba;
-  limpiar_pantalla();
-  titulo_principal();
-  cout << "\n\t\t\t\tMENU USUARIOS\n";
-  cout << "\t\tIngresar: ";
-  cin >> prueba;
-  cin.ignore();
-}
-
-void menu_cita() {
-  int prueba;
-  limpiar_pantalla();
-  titulo_principal();
-  cout << "\n\t\t\t\tMENU CITA\n";
-  cout << "\t\tIngresar: ";
-  cin >> prueba;
-  cin.ignore();
-}
-
-void menu_historial() {
-  int prueba;
-  limpiar_pantalla();
-  titulo_principal();
-  cout << "\n\t\t\t\tMENU HISTORIAL\n";
-  cout << "\t\tIngresar: ";
-  cin >> prueba;
-  cin.ignore();
-}
-
-void menu_reportes() {
-  int prueba;
-  limpiar_pantalla();
-  titulo_principal();
-  cout << "\n\t\t\t\tMENU REPORTES\n";
-  cout << "\t\tIngresar: ";
-  cin >> prueba;
-  cin.ignore();
-}
-
-void titulo_principal(void) {
-  cout << "\n     ======================================================================\n";
-  cout << "\t\t\t\t CLINICA FISI\n";
-  cout << "     ======================================================================\n";
-}
-
-int obtener_entero() {
-  bool no_es_entero = true;
-  string valor;
-
-  while (no_es_entero) {
-    try {
-      getline(cin, valor);
-      if (!es_entero_valido(valor)) {
-        throw valor;
-      }
-    } catch(string e) {
-      cout << "Por favor, ingrese un entero valido: ";
-      continue;
-    }
-    no_es_entero = false;
-  }
-  return atoi(valor.c_str());
-}
-
-int obtener_entero(int inf, int sup) {
-  bool no_aceptado = true;
-  int numero;
-  while (no_aceptado) {
-    try {
-      numero = obtener_entero();
-      if (numero < inf || numero > sup) {
-        throw numero;
-      }
-    }catch(int e) {
-      cout << "\t\tPor favor, ingrese un numero entero entre " << inf << " y " << sup << ": [ ]\b\b";
-      continue;
-    }
-    no_aceptado = false;
-  }
-  return numero;
-}
-
-bool es_entero_valido(string str) {
-  int inicio = 0;
-  int i;
-  bool valido = true;
-  bool signo = false;
-
-  if (int(str.length()) == 0) {
-    valido = false;
-  }
-
-  if (str.at(0) == '-' || str.at(0) == '+') {
-    signo = true;
-    inicio = 1;
-  }
-  if (signo && int(str.length()) == 1) {
-    valido = false;
-  }
-
-  i = inicio;
-  while (valido && i < int(str.length())) {
-    if (!isdigit(str.at(i))) {
-      valido = false;
-    }
-    i++;
-  }
-
-  return valido;
-}
-
-void limpiar_pantalla(void) {
-  system("clear");
+  cout << "\n\t\tIngrese una opcion: ";
 }
 
 void opcion_crear_servicio(void) {
@@ -291,9 +186,9 @@ void opcion_crear_servicio(void) {
       getline(cin, nombre);
       strcpy(serv.nombre, nombre.c_str());
 
-      cout << "\tDuración del servicio: ";
+      cout << "\tDuracion del servicio (min): ";
       serv.duracion = obtener_entero();
-      cout << "\tPrecio: ";
+      cout << "\tPrecio (s/.): ";
       serv.precio = obtener_flotante();
       especialidad = "pendiente";
       strcpy(serv.especialidad, especialidad.c_str());
@@ -303,8 +198,7 @@ void opcion_crear_servicio(void) {
       } else {
         cout << "\n\tOcurrio un error al intentar crear el servicio" << endl;
         cout << "\tIntentelo nuevamente" << endl;
-      }
-
+      }	
     } else {
       cout << "\n\tEl servicio de codigo " << codigo << " ya existe.\n";
       cout << "\t  No puede ingresar dos servicios con el mismo codigo" << endl;
@@ -335,68 +229,6 @@ bool existe_servicio(int codigo_servicio, Servicio *serv) {
     fclose(archivo);
   }
   return existe;
-}
-
-double obtener_flotante(void) {
-  bool no_es_flotante = true;
-  string valor;
-
-  while (no_es_flotante) {
-    try {
-      getline(cin, valor);
-      if (!es_flotante_valido(valor)) {
-        throw valor;
-      }
-    } catch(string e) {
-      cout << "\t\tPor favor, ingrese un numero decimal valido: ";
-      continue;
-    }
-    no_es_flotante = false;
-  }
-  return atof(valor.c_str());
-}
-
-bool es_flotante_valido(string str) {
-  int inicio = 0;
-  int i, n_puntos = 0;
-  bool valido = true;
-  bool signo = false;
-
-  if (int(str.length()) == 0) {
-    valido = false;
-  }
-
-  if (str.at(0) == '-' || str.at(0) == '+') {
-    signo = true;
-    inicio = 1;
-  }
-
-  if (str.at(1) == '.') {
-    valido = false;
-  }
-
-  if (signo && int(str.length()) == 1) {
-    valido = false;
-  }
-
-  i = inicio;
-  while (valido && i < int(str.length())) {
-    if (!isdigit(str.at(i))) {
-      if (!(str.at(i) == '.')) {
-        valido = false;
-      }
-    }
-    if (str.at(i) == '.') {
-      n_puntos++;
-    }
-    i++;
-  }
-
-  if (n_puntos > 1) {
-    valido = false;
-  }
-
-  return valido;
 }
 
 bool insertar_servicio_archivo(Servicio serv) {
@@ -439,7 +271,7 @@ void opcion_mostrar_servicio() {
         cout << "\t\tPrecio: " << servicios[i].precio << endl;
         cout << "\t\tEspecialidad: " << servicios[i].especialidad << endl;
       }
-    cout << "\n\t   ------------------------------------------------------------\n";
+      cout << "\n\t   ------------------------------------------------------------\n";
     }
     pausar_pantalla();
   }
@@ -511,14 +343,14 @@ void opcion_actualizar_servicio(void) {
         }
       }
     } else {
-        cout << "\n\tEl servicio de codigo " << codigo << " no existe.\n";
+      cout << "\n\tEl servicio de codigo " << codigo << " no existe.\n";
     }
 
     cout << "\n\tDeseas modificar otro servicio? [S/N]: ";
     getline(cin, respuesta);
-      if (!(respuesta.compare("S") == 0 || respuesta.compare("s") == 0)) {
-        se_repite = false;
-      }
+    if (!(respuesta.compare("S") == 0 || respuesta.compare("s") == 0)) {
+      se_repite = false;
+    }
   } while (se_repite);
 }
 
@@ -679,6 +511,166 @@ Servicio *obtener_st_archivo(int *n) {
     fclose(archivo);
   }
   return servicios;
+}
+
+void menu_cita() {
+  int prueba;
+  limpiar_pantalla();
+  titulo_principal();
+  cout << "\n\t\t\t\tMENU CITA\n";
+  pausar_pantalla();
+}
+
+void menu_historial() {
+  int prueba;
+  limpiar_pantalla();
+  titulo_principal();
+  cout << "\n\t\t\t\tMENU HISTORIAL\n";
+  pausar_pantalla();
+}
+
+void menu_reportes() {
+  int prueba;
+  limpiar_pantalla();
+  titulo_principal();
+  cout << "\n\t\t\t\tMENU REPORTES\n";
+  pausar_pantalla();
+}
+
+int obtener_entero() {
+  bool no_es_entero = true;
+  string valor;
+
+  while (no_es_entero) {
+    try {
+      getline(cin, valor);
+      if (!es_entero_valido(valor)) {
+        throw valor;
+      }
+    } catch(string e) {
+      cout << "\t\tPor favor, ingrese un entero valido: ";
+      continue;
+    } catch(...) {
+      cout << " ";
+    }
+    no_es_entero = false;
+  }
+  return atoi(valor.c_str());
+}
+
+int obtener_entero(int inf, int sup) {
+  bool no_aceptado = true;
+  int numero;
+  while (no_aceptado) {
+    try {
+      numero = obtener_entero();
+      if (numero < inf || numero > sup) {
+        throw numero;
+      }
+    }catch(int e) {
+      cout << "\t\tPor favor, ingrese un numero entero entre " << inf << " y " << sup << ": ";
+      continue;
+    }
+    no_aceptado = false;
+  }
+  return numero;
+}
+
+bool es_entero_valido(string str) {
+  int inicio = 0;
+  int i;
+  bool valido = true;
+  bool signo = false;
+
+  if (int(str.length()) == 0) {
+    valido = false;
+  }
+
+  if (str.at(0) == '-' || str.at(0) == '+') {
+    signo = true;
+    inicio = 1;
+  }
+
+  if (signo && int(str.length()) == 1) {
+    valido = false;
+  }
+
+  i = inicio;
+  while (valido && i < int(str.length())) {
+    if (!isdigit(str.at(i))) {
+      valido = false;
+    }
+    i++;
+  }
+
+  return valido;
+}
+
+void limpiar_pantalla(void) {
+  system("clear");
+}
+
+double obtener_flotante(void) {
+  bool no_es_flotante = true;
+  string valor;
+
+  while (no_es_flotante) {
+    try {
+      getline(cin, valor);
+      if (!es_flotante_valido(valor)) {
+        throw valor;
+      }
+    } catch(string e) {
+      cout << "\t\tPor favor, ingrese un numero decimal valido: ";
+      continue;
+    }
+    no_es_flotante = false;
+  }
+  return atof(valor.c_str());
+}
+
+bool es_flotante_valido(string str) {
+  int inicio = 0;
+  int i, n_puntos = 0;
+  bool valido = true;
+  bool signo = false;
+
+  if (int(str.length()) == 0) {
+    valido = false;
+  }
+
+  if (str.at(0) == '-' || str.at(0) == '+') {
+    signo = true;
+    inicio = 1;
+  }
+
+  if (str.at(1) == '.') {
+    valido = false;
+  }
+
+  if (signo && int(str.length()) == 1) {
+    valido = false;
+  }
+
+  i = inicio;
+  while (valido && i < int(str.length())) {
+    if (!isdigit(str.at(i))) {
+      if (!(str.at(i) == '.')) {
+        valido = false;
+      }
+    }
+
+    if (str.at(i) == '.') {
+      n_puntos++;
+    }
+    i++;
+  }
+
+  if (n_puntos > 1) {
+    valido = false;
+  }
+
+  return valido;
 }
 
 void pausar_pantalla() {
