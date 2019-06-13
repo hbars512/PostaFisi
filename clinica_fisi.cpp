@@ -4,6 +4,18 @@
 #define PARA_ELIMINAR -1
 using namespace std;
 
+struct Usuario {
+  int DNI;
+  char nombre[50];
+  char apellidoP[50];
+  char apellidoM[50];
+  int telefono;
+  char gmail[50];
+  char centrodeestudio[50];
+  char tipo[50];
+  char pasword[50];
+};
+
 struct Servicio {
   int codigo;
   char nombre[50];
@@ -14,6 +26,11 @@ struct Servicio {
 
 void menu_principal();
 void menu_usuario();
+void menu_usuario_opciones();
+void opcion_crear_usuario();
+bool insertar_usuario_archivo(Usuario user);
+bool existe_usuario(int codigo,Usuario *user);
+
 void menu_especialidad();
 
 
@@ -60,7 +77,7 @@ void titulo_principal(void) {
   cout << "     ======================================================================\n";
 }
 
-void menu_principal(void) {
+void menu_principal() {
   void menu_principal_opciones();
   bool se_repite = true;
   int opcion;
@@ -110,11 +127,146 @@ void menu_principal_opciones(void) {
 }
 
 void menu_usuario() {
+  bool se_repite = true;
+  int opcion;
+  titulo_principal();
+  do{
+    menu_usuario_opciones();
+    opcion=obtener_entero();
+    switch(opcion){
+      case 1:
+        opcion_crear_usuario();
+        break;
+    }
+  }while(se_repite);
+
+  cout << "\n\t\t\t\tMENU USUARIOS\n";
+  menu_usuario_opciones();
+  pausar_pantalla();
+
+}
+void menu_usuario_opciones(){
+
   limpiar_pantalla();
   titulo_principal();
   cout << "\n\t\t\t\tMENU USUARIOS\n";
-  pausar_pantalla();
+  cout << "\n\n\t\t[1]. Crear Usuario";
+  cout << "\n\t\t[2]. Mostrar Usuario";
+  cout << "\n\t\t[3]. Actualizar Usuario";
+  cout << "\n\t\t[4]. Eliminar Usuario";
+  cout << "\n\t\t[5]. Volver al menu principal\n";
+  cout << "\n\t\tIngrese una opcion: ";
 
+}
+void opcion_crear_usuario(){
+  bool se_repite=true;
+  Usuario user;
+  int tipo,DNI;
+  string nombre,aPaterno,aMaterno,correo,centro,tipoUsuario,contra,opc;
+  do{
+    limpiar_pantalla();
+    titulo_principal();
+    cout << "\n\t\tCREAR NUEVO USUARIO\n";
+    cout << "\n\tIngresa el DNI del usuario: ";
+    DNI=obtener_entero();
+    if(!existe_usuario(DNI,&user)){
+      user.DNI=DNI;
+      cout << "\tIngresa el Nombre del usuario: ";
+      getline(cin,nombre);
+      strcpy(user.nombre,nombre.c_str());
+      cout << "\tIngresa el Apellido Paterno del usuario: ";
+      getline(cin,aPaterno);
+      strcpy(user.apellidoP,aPaterno.c_str());
+      cout << "\tIngresa el Apellido Materno del usuario: ";
+      getline(cin,aMaterno);
+      strcpy(user.apellidoM,aMaterno.c_str());
+      cout << "\tIngresa el NumeroTelefonico del usuario: ";
+      user.telefono=obtener_entero();
+      cout << "\tIngresa el Correo Electronico del usuario: ";
+      getline(cin,correo);
+      strcpy(user.gmail,correo.c_str());
+      cout << "\tIngresa el Centro de estudios del usuario: ";
+      getline(cin,centro);
+      strcpy(user.centrodeestudio,centro.c_str());
+      cout << "\t\t\t\tIngresa el Tipo de usuario: \n";
+      cout << "\t\tAdministrador.....[1]\n";
+      cout << "\t\tDoctor............[2]\n";
+      cout << "\t\tEnfermera.........[3]\n";
+      cout << "\t\tCajero............[4]";
+      tipo=obtener_entero(1,4);
+      switch(tipo){
+        case 1:
+          tipoUsuario="Administrador";
+          strcpy(user.tipo,tipoUsuario.c_str());
+          break;
+        case 2:
+          tipoUsuario="Doctor";
+          strcpy(user.tipo,tipoUsuario.c_str());
+          break;
+        case 3:
+          tipoUsuario="Enfermera";
+          strcpy(user.tipo,tipoUsuario.c_str());
+          break;
+        case 4:
+          tipoUsuario="Cajero";
+          strcpy(user.tipo,tipoUsuario.c_str());
+          break;
+      }
+      cout << "\tIngresa el pasword del usuario: ";
+      getline(cin,contra);
+      strcpy(user.pasword,contra.c_str());
+
+      if(insertar_usuario_archivo(user)){
+        cout << "\n\t\t\t\t\tEl usuario fue creado con exito";
+      }else{
+        cout << "\n\tOcurrio un error al intentar crear el usuario" << endl;
+        cout << "\tIntentelo nuevamente" << endl;
+      }
+    }else{
+      cout << "\n\tEl Usuario con DNI " << DNI << " ya existe.\n";
+      cout << "\t  No puede ingresar dos Usuarios con el mismo DNI" << endl;
+    }
+    cout <<" ";
+    cout << "\n\t\t\t\tDesea seguir ingresando Usuarios? [S/n]: ";
+    fflush(stdin);
+    getline(cin,opc);
+    if(!(opc.compare("S")==0 || opc.compare("s")==0)){
+      se_repite=false;
+    }
+
+  }while(se_repite);
+
+}
+bool insertar_usuario_archivo(Usuario user){
+  FILE *datosUsuario;
+  bool agregado;
+  datosUsuario = fopen("datosDeUsuario.dat","ab");
+  if(datosUsuario==NULL){
+    agregado=false;	
+  }else{
+    fwrite(&user,sizeof(user),1,datosUsuario);
+    agregado=true;
+    fclose(datosUsuario);
+  }
+  return agregado;
+}
+bool existe_usuario(int DNI,Usuario *user){
+  FILE* datosUsuario;
+  bool existe=false;
+
+  datosUsuario=fopen("datosDeUsuario.dat","rb");
+  if(!(datosUsuario==NULL)){
+    fread(&(*user),sizeof(*user),1,datosUsuario);
+    while(!feof(datosUsuario)){
+      if((*user).DNI==DNI){
+        existe=true;
+        break;
+      }
+      fread(&(*user),sizeof(*user),1,datosUsuario);
+    }
+    fclose(datosUsuario);
+  }
+  return existe;
 }
 
 void menu_especialidad() {
